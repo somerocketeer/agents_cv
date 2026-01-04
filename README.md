@@ -1,6 +1,6 @@
 # Agent CV
 
-## Memory Stack: Next-Gen Memory System
+## 1. Memory Stack: Next-Gen Memory System
 
 **Purpose**: Scalable, distributed memory system replacing the SQLite-backed implementation. Designed for 1M+ items with temporal knowledge graph, hybrid search, and automatic consolidation.
 
