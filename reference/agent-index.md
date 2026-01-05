@@ -763,7 +763,7 @@ Alphabetical index of all agents across all domains.
 ## Summary
 
 - **Total Agents**: 90
-- **Orchestrators**: 11
-- **Subagents**: 73
+- **Orchestrators**: 14 (1 ops, 3 docs, 9 marketing, 1 blog & design)
+- **Subagents**: 70
 - **Standalone**: 6
 - **Domains**: 4 (Ops, Documentation, Marketing, Blog & Design)

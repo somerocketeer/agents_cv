@@ -4,10 +4,11 @@ A comprehensive portfolio of AI agent systems and pipelines for executive assist
 
 ## Quick Stats
 
-- **Total Agents**: ~90 across 4 domains
-- **Orchestrators**: 11 (3 docs, 8 marketing)
-- **Subagents**: 60+ specialized workers
-- **Infrastructure**: Memory systems, MCP tools, skills, style guides
+- **Total Agents**: 90 across 4 domains
+- **Orchestrators**: 14 (1 ops, 3 docs, 9 marketing, 1 blog & design)
+- **Subagents**: 70 specialized workers
+- **Standalone**: 6 utility agents
+- **Infrastructure**: Memory systems, MCP tools, sandboxes, style guides
 
 ---
 
@@ -156,14 +157,14 @@ All orchestrators follow sequential phase execution with fail-fast behavior:
 
 ## Domain Summaries
 
-### Ops (Silas) - 8 agents
+### Ops (Silas) - 7 agents
 Executive assistant with persistent memory, CRM, and autonomous task management. Runs scheduled briefings, meeting prep, and proactive suggestions.
 
 **Key Features**:
 - Hybrid recall (Postgres + Qdrant + Neo4j)
 - Self-tuning configuration
 - Energy-type task prioritization
-- 5 specialized subagents
+- 6 specialized subagents (research, drafter, memory, meeting-prep, comms, suggestions)
 
 ### Documentation - 19 agents
 End-to-end documentation lifecycle from scratchpad to verified, published docs with Playwright testing.
@@ -174,12 +175,12 @@ End-to-end documentation lifecycle from scratchpad to verified, published docs w
 - Code placeholder injection
 - Playwright workflow verification
 
-### Marketing - 60+ agents
+### Marketing - 51 agents
 B2B content production with evidence-backed thought leadership across 8 content types.
 
 **Key Features**:
-- 8 orchestrators (blog, whitepaper, datasheet, etc.)
-- Shared subagents (fact_bank_builder, persona_calibrator)
+- 9 orchestrators (blog, whitepaper, datasheet, solution-brief, newsletter, linkedin, customer-success, video-integration, integration-outline)
+- Shared subagents (fact_bank_builder, persona_calibrator, marketing_research_scout)
 - Tiered research (T1-T4 confidence)
 - Strict anti-LLM discipline
 
