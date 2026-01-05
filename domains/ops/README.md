@@ -8,12 +8,15 @@ Silas is an AI-powered executive assistant with persistent memory, autonomous ta
 
 **Primary Agent**: `silas` (Claude Opus 4.5, temp 0.2)
 
-**Subagents**: 5 specialized workers
-- `silas-research` - Deep exploration
-- `silas-drafter` - Long-form writing
-- `silas-memory` - Memory curation
-- `silas-meeting-prep` - Meeting briefings
-- `silas-comms` - Quick messages
+**Agents**: 8 total
+- `silas` - Primary orchestrator (Claude Opus 4.5, temp 0.2)
+- `silas-research` - Deep exploration (Claude Sonnet 4.5, temp 0.3)
+- `silas-drafter` - Long-form writing (Gemini 3 Pro, temp 0.4)
+- `silas-memory` - Memory curation (Claude Sonnet 4.5, temp 0.2)
+- `silas-meeting-prep` - Meeting briefings (Claude Sonnet 4.5, temp 0.3)
+- `silas-comms` - Quick messages (Claude Sonnet 4.5, temp 0.5)
+- `suggestions` - Morning/calendar/proactive (Claude Sonnet 4.5, temp 0.3)
+- `weekly-review` - Weekly planning (Claude Sonnet 4.5, temp 0.3)
 
 **Infrastructure**:
 - Memory Stack (Postgres + Qdrant + Neo4j)
@@ -164,6 +167,30 @@ return {
 
 ---
 
+## Permission Scoping (op1-policy.json)
+
+Silas operates under a permission policy that gates sensitive operations:
+
+| Scope | Permission | Notes |
+|-------|------------|-------|
+| `todos:read` | ✓ Allowed | |
+| `todos:write` | ✓ Allowed | |
+| `reminders:read` | ✓ Allowed | |
+| `reminders:write` | ✓ Allowed | |
+| `email:read` | ✓ Allowed | |
+| `email:draft` | ✓ Allowed | |
+| `email:send` | ✗ Gated | Requires user confirmation |
+| `calendar:read` | ✓ Allowed | |
+| `calendar:write` | ✗ Gated | Requires user confirmation |
+| `memory:read` | ✓ Allowed | |
+| `memory:write` | ✓ Allowed | |
+| `exec:shell` | ✗ Denied | Shell execution blocked |
+| `network:unrestricted` | ✗ Denied | Network access restricted |
+
+This policy ensures Silas can work autonomously on low-risk tasks while requiring confirmation for actions that could have unintended consequences.
+
+---
+
 ## Delegation (Subagents)
 
 ### When to Delegate
@@ -236,6 +263,7 @@ RecallResult:
 | `learning.min_pattern_confidence` | Threshold to surface patterns (default: 0.3) |
 | `behavior.ask_clarifying_questions` | Whether to ask vs infer (default: true) |
 | `behavior.proactive_suggestions` | Whether to volunteer info (default: true) |
+| `behavior.auto_observe_corrections` | Auto-record corrections when detected (default: true) |
 
 **When to self-tune**:
 - If user says "you forget too fast" → increase `memory.half_life_days`
@@ -289,15 +317,22 @@ Consider time of day and calendar density when suggesting focus:
 
 ## Commands
 
-| Command | Purpose |
-|---------|---------|
-| `/morning` | Daily briefing (calendar, energy-typed todos, urgent items) |
-| `/prep "Meeting topic"` | Meeting preparation (attendees, context, agenda) |
-| `/todos` | Energy-typed task list |
-| `/meeting-notes` | Process meeting notes (extract people, actions, context) |
-| `/weekly-review` | Pattern confirmation and learning cycle |
-| `/status` | System health check (jobs, memory stats) |
-| `/proactive-check` | Background proactive suggestions |
+| Command | Agent | Purpose |
+|---------|-------|---------|
+| `/morning` | suggestions | Daily briefing (calendar, energy-typed todos, urgent items) |
+| `/silas` | silas | Start conversation with Silas |
+| `/todos` | silas | Energy-typed task list |
+| `/inbox` | silas | Check and triage email |
+| `/calendar` | suggestions | Today's calendar overview |
+| `/remind` | silas | Set a reminder |
+| `/prep "topic"` | silas | Meeting preparation (attendees, context, agenda) |
+| `/meeting-notes` | silas | Process notes (extract people, actions, context) |
+| `/wrap-up` | silas | End of day sync and capture |
+| `/weekly-review` | weekly-review | Pattern confirmation and learning cycle |
+| `/status` | silas | System health check (jobs, memory stats) |
+| `/proactive-check` | suggestions | Background proactive suggestions |
+| `/project` | silas | Project context management |
+| `/tui` | — | Launch Silas dashboard GUI |
 
 ---
 
@@ -336,73 +371,77 @@ python3 scripts/memory_stack.py reset --yes
 
 ---
 
+## Disabled Features (oh-my-opencode.json)
+
+The Ops workspace intentionally disables many standard OpenCode features for a focused implementation:
+
+**Disabled Agents**: sisyphus, oracle, librarian, explore, frontend-ui-ux-engineer, document-writer, multimodal-looker
+
+**Disabled MCPs**: websearch_exa, context7, grep_app
+
+**Disabled Commands**: init-deep
+
+**Disabled Skills**: playwright
+
+**Disabled Hooks**: 50+ hooks including todo-continuation-enforcer, context-window-monitor, session-recovery, thinking-block-validator, etc.
+
+**Claude Code Features**: All disabled (mcp: false, commands: false, skills: false, agents: false, hooks: false, plugins: false)
+
+This configuration creates a streamlined environment where Silas operates without interference from generic agent behaviors.
+
+---
+
 ## File Layout
 
 ```
 Ops/
 ├── .opencode/
-│   ├── agent/
+│   ├── agent/                    # Agent definitions (8 agents)
 │   │   ├── silas.md
 │   │   ├── silas-research.md
 │   │   ├── silas-drafter.md
 │   │   ├── silas-memory.md
 │   │   ├── silas-meeting-prep.md
 │   │   ├── silas-comms.md
-│   │   └── suggestions.md
+│   │   ├── suggestions.md
+│   │   └── weekly-review.md
 │   ├── persona/
-│   │   └── silas.md
-│   ├── tool/
-│   │   ├── memory-sandbox.ts
-│   │   └── ops-sandbox.ts
-│   ├── command/
+│   │   └── silas.md              # Voice and identity guidelines
+│   ├── tool/                     # Sandbox implementations
+│   │   ├── ops-sandbox.ts        # Calendar, email, todos, reminders, notes
+│   │   ├── memory-sandbox.ts     # Wraps silas_memory_* MCP tools
+│   │   ├── atlassian-sandbox.ts  # Jira + Confluence
+│   │   ├── granola-sandbox.ts    # Meeting transcripts
+│   │   ├── askuser.ts            # Interactive prompts
+│   │   └── lib/                  # Supporting libraries
+│   ├── command/                  # Slash commands (13 commands)
 │   │   ├── morning.md
-│   │   ├── prep.md
+│   │   ├── silas.md
 │   │   ├── todos.md
+│   │   ├── inbox.md
+│   │   ├── calendar.md
+│   │   ├── remind.md
+│   │   ├── prep.md
 │   │   ├── meeting-notes.md
+│   │   ├── wrap-up.md
 │   │   ├── weekly-review.md
 │   │   ├── status.md
-│   │   └── proactive-check.md
-│   ├── scripts/
-│   │   ├── mcp_memory_server.py (legacy)
-│   │   ├── db.py
-│   │   ├── memory_cli.py
-│   │   ├── learn.py
-│   │   ├── nightly_maintenance.py
-│   │   ├── embeddings.py
-│   │   └── config.py
-│   ├── memory-stack/
-│   │   ├── README.md
-│   │   ├── ARCHITECTURE.md
+│   │   ├── proactive-check.md
+│   │   └── project.md
+│   ├── memory-stack/             # Memory system implementation
 │   │   ├── scripts/
-│   │   │   ├── mcp_memory_server.py (new)
-│   │   │   ├── memory_stack.py
-│   │   │   ├── stack_env.py
-│   │   │   ├── ontology.py
-│   │   │   ├── config_store.py
-│   │   │   ├── embedding_client.py
-│   │   │   ├── import_legacy_sqlite.py
-│   │   │   ├── store/
-│   │   │   │   ├── postgres.py
-│   │   │   │   ├── qdrant.py
-│   │   │   │   └── neo4j.py
-│   │   │   ├── retrieval/
-│   │   │   │   └── controller.py
-│   │   │   ├── workers/
-│   │   │   │   ├── embed_worker.py
-│   │   │   │   └── kg_worker.py
-│   │   │   ├── migrations/
-│   │   │   │   └── neo4j/
-│   │   │   └── bench/
-│   │   │       ├── seed_memory.py
-│   │   │       └── smoke_test.py
-│   │   ├── memory/
-│   │   │   ├── stack/
-│   │   │   ├── ontology.yaml
-│   │   │   ├── config.json
-│   │   │   └── conventions.md
-│   │   └── agent/
-│   └── nix/
-│       └── home-module.nix
+│   │   │   ├── mcp_memory_server.py
+│   │   │   ├── memory_stack.py   # CLI orchestrator
+│   │   │   ├── store/            # Postgres, Qdrant, Neo4j clients
+│   │   │   ├── retrieval/        # Hybrid recall controller
+│   │   │   └── workers/          # embed_worker.py, kg_worker.py
+│   │   └── memory/
+│   │       ├── ontology.yaml     # KG schema
+│   │       ├── config.json       # Self-tuning config
+│   │       └── conventions.md    # User preferences
+│   ├── opencode.json             # Agent/tool configuration
+│   ├── op1-policy.json           # Permission scoping
+│   └── oh-my-opencode.json       # Disabled features
 └── .beads/
     └── README.md
 ```

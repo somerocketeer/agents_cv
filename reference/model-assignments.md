@@ -37,11 +37,12 @@ Comprehensive model routing strategy across all agents and domains.
 |-------|-------|------|-----------|
 | `silas` | Claude Opus 4.5 | 0.2 | Primary orchestration, balanced decision-making |
 | `silas-research` | Claude Sonnet 4.5 | 0.3 | Exploratory research, synthesis |
-| `silas-drafter` | Claude Sonnet 4.5 | 0.5 | Creative long-form writing |
+| `silas-drafter` | Gemini 3 Pro | 0.4 | Creative long-form writing (long context) |
 | `silas-memory` | Claude Sonnet 4.5 | 0.15 | Pattern analysis, learning cycles |
 | `silas-meeting-prep` | Claude Sonnet 4.5 | 0.2 | Structured briefings |
 | `silas-comms` | Claude Sonnet 4.5 | 0.4 | Voice-matched quick messages |
-| `suggestions` | Claude Sonnet 4.5 | 0.25 | Proactive recommendations |
+| `suggestions` | Claude Sonnet 4.5 | 0.3 | Proactive recommendations |
+| `weekly-review` | Claude Sonnet 4.5 | 0.3 | Weekly planning and patterns |
 
 ### Documentation
 

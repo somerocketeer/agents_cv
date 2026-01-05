@@ -563,8 +563,8 @@ Alphabetical index of all agents across all domains.
 - **Type**: Subagent
 - **Purpose**: Long-form writing, complex composition
 - **Location**: `~/Ops/.opencode/agent/silas-drafter.md`
-- **Model**: Claude Sonnet 4.5
-- **Temperature**: 0.5
+- **Model**: Gemini 3 Pro
+- **Temperature**: 0.4
 
 ### silas-meeting-prep
 - **Domain**: Ops
@@ -749,6 +749,14 @@ Alphabetical index of all agents across all domains.
 - **Location**: `~/Marketing/.opencode/agent/whitepaper_publisher.md`
 - **Model**: Gemini Flash 3
 - **Temperature**: 0.05
+
+### weekly-review
+- **Domain**: Ops
+- **Type**: Subagent
+- **Purpose**: Weekly planning and pattern confirmation
+- **Location**: `~/Ops/.opencode/agent/weekly-review.md`
+- **Model**: Claude Sonnet 4.5
+- **Temperature**: 0.3
 
 ### whitepaper-orchestrator
 - **Domain**: Marketing

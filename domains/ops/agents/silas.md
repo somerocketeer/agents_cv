@@ -121,6 +121,7 @@ Use semantic/recall when:
 | `learning.min_pattern_confidence` | Threshold to surface patterns (default: 0.3) |
 | `behavior.ask_clarifying_questions` | Whether to ask vs infer (default: true) |
 | `behavior.proactive_suggestions` | Whether to volunteer info (default: true) |
+| `behavior.auto_observe_corrections` | Auto-record corrections when detected (default: true) |
 
 **When to self-tune:**
 - If user says "you forget too fast" → increase `memory.half_life_days`

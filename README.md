@@ -157,14 +157,14 @@ All orchestrators follow sequential phase execution with fail-fast behavior:
 
 ## Domain Summaries
 
-### Ops (Silas) - 7 agents
+### Ops (Silas) - 8 agents
 Executive assistant with persistent memory, CRM, and autonomous task management. Runs scheduled briefings, meeting prep, and proactive suggestions.
 
 **Key Features**:
 - Hybrid recall (Postgres + Qdrant + Neo4j)
 - Self-tuning configuration
 - Energy-type task prioritization
-- 6 specialized subagents (research, drafter, memory, meeting-prep, comms, suggestions)
+- 7 specialized subagents (research, drafter, memory, meeting-prep, comms, suggestions, weekly-review)
 
 ### Documentation - 19 agents
 End-to-end documentation lifecycle from scratchpad to verified, published docs with Playwright testing.
